@@ -1,20 +1,24 @@
-import React, { useState } from "react";
-import { useClients } from "../hooks/useClients";
-import { useDebounce } from "../hooks/useDebounce";
-import { Search, Plus, Users, LayoutGrid, Table } from "lucide-react";
+import React, { useState } from 'react';
+import { useClients } from '../hooks/useClients';
+import { useDebounce } from '../hooks/useDebounce';
+import { Search, Plus, Users, LayoutGrid, Table } from 'lucide-react';
 
-import { ClientFormModal } from "../components/ClientFromModal";
-import { ClientGridView } from "../components/ClientGridView";
-import { ClientTableView } from "../components/ClientTableView";
-import { ClientDeleteModal } from "../components/ClientDeleteModal";
+import { ClientFormModal } from '../components/ClientFromModal';
+import { ClientGridView } from '../components/ClientGridView';
+import { ClientTableView } from '../components/ClientTableView';
+import { ClientDeleteModal } from '../components/ClientDeleteModal';
 
-import { Spinner, useDisclosure } from "@heroui/react";
+import { Spinner, useDisclosure } from '@heroui/react';
 
 export const Dashboard = () => {
   const { getClients, addClient, updateClient, deleteClient } = useClients();
   const { data: clients = [], status } = getClients;
 
-  const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
+  const {
+    isOpen: isAddEditModalOpen,
+    onOpen: onAddEditModalOpen,
+    onOpenChange: onAddEditModalOpenChange,
+  } = useDisclosure();
 
   const {
     isOpen: isDeleteModalOpen,
@@ -23,8 +27,8 @@ export const Dashboard = () => {
   } = useDisclosure();
 
   const [selectedClient, setSelectedClient] = useState(null);
-  const [search, setSearch] = useState("");
-  const [view, setView] = useState("grid");
+  const [search, setSearch] = useState('');
+  const [view, setView] = useState('grid');
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -51,7 +55,6 @@ export const Dashboard = () => {
     } else {
       addClient.mutate(data);
     }
-    setIsAddEditModalOpen(false);
     setSelectedClient(null);
   };
 
@@ -63,7 +66,7 @@ export const Dashboard = () => {
 
   const openEditModal = (client) => {
     setSelectedClient(client);
-    setIsAddEditModalOpen(true);
+    onAddEditModalOpen();
   };
 
   const openDeleteModal = (client) => {
@@ -71,7 +74,7 @@ export const Dashboard = () => {
     onDeleteModalOpen();
   };
 
-  if (status === "loading" && !clients) {
+  if (status === 'loading' && !clients) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Spinner size="lg" color="primary" />
@@ -92,7 +95,7 @@ export const Dashboard = () => {
                 Client Management
               </h1>
               <p className="text-gray-600 mt-1">
-                {clients.length} {clients.length === 1 ? "client" : "clients"}{" "}
+                {clients.length} {clients.length === 1 ? 'client' : 'clients'}{' '}
                 total
               </p>
             </div>
@@ -101,17 +104,17 @@ export const Dashboard = () => {
             <button
               onClick={() => {
                 setSelectedClient({
-                  name: "",
-                  email: "",
-                  phone: "",
-                  tags: [""],
+                  name: '',
+                  email: '',
+                  phone: '',
+                  tags: [''],
                   address: {
-                    city: "",
-                    state: "",
-                    zip: "",
+                    city: '',
+                    state: '',
+                    zip: '',
                   },
                 });
-                setIsAddEditModalOpen(true);
+                onAddEditModalOpen();
               }}
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-200 shadow"
             >
@@ -119,10 +122,10 @@ export const Dashboard = () => {
               Add Client
             </button>
             <button
-              onClick={() => setView(view === "grid" ? "table" : "grid")}
+              onClick={() => setView(view === 'grid' ? 'table' : 'grid')}
               className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-white text-gray-700 hover:bg-gray-100 shadow-sm transition"
             >
-              {view === "grid" ? (
+              {view === 'grid' ? (
                 <>
                   <Table className="h-5 w-5 text-blue-600" />
                   <span>Switch to Table</span>
@@ -153,7 +156,7 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {view === "grid" ? (
+        {view === 'grid' ? (
           <ClientGridView
             clients={filteredClients}
             onEdit={openEditModal}
@@ -179,12 +182,14 @@ export const Dashboard = () => {
 
       <ClientFormModal
         isOpen={isAddEditModalOpen}
-        onClose={() => {
-          setIsAddEditModalOpen(false);
-          setSelectedClient(null);
+        onOpenChange={(isOpen) => {
+          onAddEditModalOpenChange(isOpen);
+          if (!isOpen) {
+            setSelectedClient(null);
+          }
         }}
         onSubmit={handleFormSubmit}
-        defaultValues={selectedClient || {}}
+        selectedClient={selectedClient}
       />
 
       <ClientDeleteModal

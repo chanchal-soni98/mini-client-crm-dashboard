@@ -13,9 +13,16 @@ export const ClientGridView = ({ clients, onEdit, onDelete }) => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full px-2 py-2 mr-4 flex items-center gap-2">
-                <UserCircle className="text-white w-8 h-8" />
+                <img
+                  src={`https://ui-avatars.com/api/?name=${client.name}&background=6C63FF&color=fff&bold=true`}
+                  alt={client.name}
+                  className="w-10 h-10 rounded-full"
+                />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 capitalize">{client.name}</h3>
+
+              <h3 className="text-xl font-bold text-gray-900 capitalize">
+                {client.name}
+              </h3>
             </div>
 
             <div className="flex space-x-2 transition">
