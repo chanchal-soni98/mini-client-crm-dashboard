@@ -51,6 +51,8 @@ Each client entry in the system follows this structure:
     "zip": "400001"
   }
 }
+
+```
 ## 🔧 Setup & Installation
 
 1. Clone the repository:
