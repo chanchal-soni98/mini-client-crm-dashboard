@@ -19,7 +19,6 @@ export const clientSchema = z.object({
 
   tags: z
     .array(z.string().min(1, "Tag cannot be empty"))
-    .min(1, "At least 1 tag required")
     .optional(),
 
   address: z.object({

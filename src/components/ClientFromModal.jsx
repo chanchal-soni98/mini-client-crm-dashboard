@@ -21,6 +21,8 @@ export const ClientFormModal = ({
 }) => {
   const isEditMode = !!defaultValues?.id;
 
+
+
   const {
     register,
     handleSubmit,
@@ -40,6 +42,24 @@ export const ClientFormModal = ({
     if (defaultValues) reset(defaultValues);
   }, [defaultValues, reset]);
 
+  useEffect(() => {
+  if (isOpen) {
+    reset({
+      name: defaultValues?.name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      tags: defaultValues?.tags?.length ? defaultValues.tags : [""],
+      address: {
+        city: defaultValues?.address?.city || "",
+        state: defaultValues?.address?.state || "",
+        zip: defaultValues?.address?.zip || "",
+      },
+    });
+  }
+}, [isOpen, defaultValues, reset]);
+
+
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onClose} placement="top-center">
       <ModalContent>
@@ -49,11 +69,16 @@ export const ClientFormModal = ({
               {defaultValues ? "Edit Client" : "Add Client"}
             </ModalHeader>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <ModalBody>
+              <ModalBody
+                className="max-h-[65vh] overflow-y-auto space-y-4 hide-scrollbar"
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+              >
                 <Input
                   {...register("name")}
                   label="Name"
-                  // placeholder="Enter name"
                   variant="bordered"
                   isInvalid={!!errors.name}
                   errorMessage={errors.name?.message}
@@ -62,7 +87,6 @@ export const ClientFormModal = ({
                 <Input
                   {...register("email")}
                   label="Email"
-                  // placeholder="Enter email"
                   variant="bordered"
                   isInvalid={!!errors.email}
                   errorMessage={errors.email?.message}
@@ -71,16 +95,12 @@ export const ClientFormModal = ({
                 <Input
                   {...register("phone")}
                   label="Phone"
-                  // placeholder="Enter phone"
                   variant="bordered"
                   isInvalid={!!errors.phone}
                   errorMessage={errors.phone?.message}
                 />
 
                 <div className="space-y-2">
-                  {/* <label className="text-sm font-medium text-gray-700">
-                    Tags
-                  </label> */}
                   {fields.map((field, index) => (
                     <div key={field.id} className="flex items-center gap-2">
                       <Input
@@ -89,13 +109,13 @@ export const ClientFormModal = ({
                         isInvalid={!!errors.tags?.[index]}
                         errorMessage={errors.tags?.[index]?.message}
                       />
-                      <button
+                      <Button
                         type="button"
-                        onClick={() => remove(index)}
+                        onPress={() => remove(index)}
                         className="text-red-500 hover:text-red-700 text-sm"
                       >
                         Remove
-                      </button>
+                      </Button>
                     </div>
                   ))}
                   <Button
@@ -108,35 +128,19 @@ export const ClientFormModal = ({
                   </Button>
                 </div>
 
-                {/* <Input
-                  {...register("tags.0")}
-                  label="Tag 1"
-                  // placeholder="Enter first tag"
-                  variant="bordered"
-                />
-                <Input
-                  {...register("tags.1")}
-                  label="Tag 2"
-                  // placeholder="Enter second tag"
-                  variant="bordered"
-                /> */}
-
                 <Input
                   {...register("address.city")}
                   label="City"
-                  // placeholder="Enter city"
                   variant="bordered"
                 />
                 <Input
                   {...register("address.state")}
                   label="State"
-                  // placeholder="Enter state"
                   variant="bordered"
                 />
                 <Input
                   {...register("address.zip")}
                   label="Zip Code"
-                  // placeholder="Enter zip"
                   variant="bordered"
                 />
               </ModalBody>

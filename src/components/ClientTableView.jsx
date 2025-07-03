@@ -43,7 +43,7 @@ export const ClientTableView = ({
                 {client.address.zip}
               </TableCell>
               <TableCell>
-                <div className="flex flex-wrap">
+                <div className="flex flex-wrap gap-2">
                   {client.tags.map((tag, index) => (
                     <Chip key={index} className="mr-2">
                       {tag}
