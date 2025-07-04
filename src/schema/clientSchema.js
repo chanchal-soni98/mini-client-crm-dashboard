@@ -6,9 +6,9 @@ const zipRegex = /^\d{5,6}$/;
 export const clientSchema = z.object({
   name: z
     .string()
-    .min(1, "Name is required")
+    .min(2, "Name should be at least 2 characters")
     .trim()
-    .refine((val) => val.length > 0, { message: "Name cannot be empty" }),
+    .refine((val) => val.length > 0, { message: "Name is required" }),
 
   email: z.string().email("Invalid email").trim(),
 
