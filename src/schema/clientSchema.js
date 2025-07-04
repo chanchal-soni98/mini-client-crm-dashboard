@@ -17,18 +17,24 @@ export const clientSchema = z.object({
     .regex(phoneRegex, "Invalid phone number")
     .refine((val) => val.length === 10, { message: "Phone must be 10 digits" }),
 
-  tags: z
+ tags: z
     .array(z.string().min(1, "Tag cannot be empty"))
-    .optional(),
+    .min(1, { message: "At least one tag is required" }),
 
   address: z.object({
-    city: z.string().min(1, "City is required").trim(),
+    city: z
+      .string()
+      .trim()
+      .min(3, { message: "City is required" }),
 
-    state: z.string().min(1, "State is required").trim(),
+    state: z
+      .string()
+      .trim()
+      .min(2, { message: "State is required" }),
 
     zip: z
       .string()
-      .regex(zipRegex, "Invalid zip code")
+      .regex(zipRegex, "Invalid zip code (must be 5 or 6 digits)")
       .min(5, "Zip must be at least 5 digits"),
   }),
 });

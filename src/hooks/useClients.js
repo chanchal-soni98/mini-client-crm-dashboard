@@ -15,6 +15,7 @@ export const useClients = () => {
   const addClient = useMutation({
     mutationFn: (newClient) => axiosInstance.post("/clients", newClient),
     onMutate: async (newClient) => {
+
       await queryClient.cancelQueries({ queryKey: ["clients"] });
 
       const previousClients = queryClient.getQueryData(["clients"]);
@@ -24,7 +25,7 @@ export const useClients = () => {
         id: Date.now(), 
       };
 
-      queryClient.setQueryData(["clients"], (old = []) => [optimisticClient, ...old]);
+      queryClient.setQueryData(["clients"], (old = []) => [ ...old,optimisticClient]);
 
       return { previousClients };
     },
@@ -78,5 +79,6 @@ export const useClients = () => {
     },
   });
 
-  return { getClients, addClient, updateClient, deleteClient };
+  return { getClients, addClient, updateClient, deleteClient, isLoadingClients: getClients.isLoading, };
+  
 };

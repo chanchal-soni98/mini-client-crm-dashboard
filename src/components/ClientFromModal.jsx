@@ -17,7 +17,6 @@ const ClientForm = ({ selectedClient, onSubmit, onClose }) => {
   const {
     register,
     handleSubmit,
-    // reset,
     control,
     formState: { errors },
   } = useForm({
@@ -28,6 +27,7 @@ const ClientForm = ({ selectedClient, onSubmit, onClose }) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'tags',
+    rules: { minLength: 1 },
   });
 
   const isEditMode = !!selectedClient?.id;
@@ -39,7 +39,7 @@ const ClientForm = ({ selectedClient, onSubmit, onClose }) => {
       </ModalHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <ModalBody
-          className="max-h-[65vh] overflow-y-auto space-y-4 hide-scrollbar"
+          className="max-h-[65vh] overflow-y-auto space-y-2 hide-scrollbar"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -97,20 +97,32 @@ const ClientForm = ({ selectedClient, onSubmit, onClose }) => {
             </Button>
           </div>
 
+          {errors.tags && (
+            <p className="text-red-500 text-sm">
+              {errors.tags.message || 'At least one tag is required.'}
+            </p>
+          )}
+
           <Input
             {...register('address.city')}
             label="City"
             variant="bordered"
+            isInvalid={!!errors.address?.city}
+            errorMessage={errors.address?.city?.message}
           />
           <Input
             {...register('address.state')}
             label="State"
             variant="bordered"
+            isInvalid={!!errors.address?.state}
+            errorMessage={errors.address?.state?.message}
           />
           <Input
             {...register('address.zip')}
             label="Zip Code"
             variant="bordered"
+            isInvalid={!!errors.address?.zip}
+            errorMessage={errors.address?.zip?.message}
           />
         </ModalBody>
         <ModalFooter>
@@ -139,7 +151,10 @@ export const ClientFormModal = ({
           <>
             <ClientForm
               selectedClient={selectedClient}
-              onSubmit={onSubmit}
+              onSubmit={(data) => {
+                onSubmit(data);
+                onClose();
+              }}
               onClose={onClose}
             />
           </>

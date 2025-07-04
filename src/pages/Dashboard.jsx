@@ -1,18 +1,24 @@
-import React, { useState } from 'react';
-import { useClients } from '../hooks/useClients';
-import { useDebounce } from '../hooks/useDebounce';
-import { Search, Plus, Users, LayoutGrid, Table } from 'lucide-react';
+import React, { useState } from "react";
+import { useClients } from "../hooks/useClients";
+import { useDebounce } from "../hooks/useDebounce";
+import { Search, Plus, Users, LayoutGrid, Table } from "lucide-react";
 
-import { ClientFormModal } from '../components/ClientFromModal';
-import { ClientGridView } from '../components/ClientGridView';
-import { ClientTableView } from '../components/ClientTableView';
-import { ClientDeleteModal } from '../components/ClientDeleteModal';
+import { ClientFormModal } from "../components/ClientFromModal";
+import { ClientGridView } from "../components/ClientGridView";
+import { ClientTableView } from "../components/ClientTableView";
+import { ClientDeleteModal } from "../components/ClientDeleteModal";
 
-import { Spinner, useDisclosure } from '@heroui/react';
+import { Spinner, useDisclosure } from "@heroui/react";
 
 export const Dashboard = () => {
-  const { getClients, addClient, updateClient, deleteClient } = useClients();
-  const { data: clients = [], status } = getClients;
+  const {
+    getClients,
+    addClient,
+    updateClient,
+    deleteClient,
+    isLoadingClients,
+  } = useClients();
+  const { data: clients = [] } = getClients;
 
   const {
     isOpen: isAddEditModalOpen,
@@ -27,8 +33,8 @@ export const Dashboard = () => {
   } = useDisclosure();
 
   const [selectedClient, setSelectedClient] = useState(null);
-  const [search, setSearch] = useState('');
-  const [view, setView] = useState('grid');
+  const [search, setSearch] = useState("");
+  const [view, setView] = useState("grid");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
@@ -50,7 +56,7 @@ export const Dashboard = () => {
   );
 
   const handleFormSubmit = (data) => {
-    if (selectedClient) {
+    if (selectedClient.id) {
       updateClient.mutate({ id: selectedClient.id, data });
     } else {
       addClient.mutate(data);
@@ -74,10 +80,14 @@ export const Dashboard = () => {
     onDeleteModalOpen();
   };
 
-  if (status === 'loading' && !clients) {
+  if (isLoadingClients) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Spinner size="lg" color="primary" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <Spinner
+          classNames={{ label: "text-foreground mt-4" }}
+          label="Loading clients, please wait..."
+          variant="wave"
+        />
       </div>
     );
   }
@@ -95,7 +105,7 @@ export const Dashboard = () => {
                 Client Management
               </h1>
               <p className="text-gray-600 mt-1">
-                {clients.length} {clients.length === 1 ? 'client' : 'clients'}{' '}
+                {clients.length} {clients.length === 1 ? "client" : "clients"}{" "}
                 total
               </p>
             </div>
@@ -104,14 +114,14 @@ export const Dashboard = () => {
             <button
               onClick={() => {
                 setSelectedClient({
-                  name: '',
-                  email: '',
-                  phone: '',
-                  tags: [''],
+                  name: "",
+                  email: "",
+                  phone: "",
+                  tags: [""],
                   address: {
-                    city: '',
-                    state: '',
-                    zip: '',
+                    city: "",
+                    state: "",
+                    zip: "",
                   },
                 });
                 onAddEditModalOpen();
@@ -122,10 +132,10 @@ export const Dashboard = () => {
               Add Client
             </button>
             <button
-              onClick={() => setView(view === 'grid' ? 'table' : 'grid')}
+              onClick={() => setView(view === "grid" ? "table" : "grid")}
               className="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-white text-gray-700 hover:bg-gray-100 shadow-sm transition"
             >
-              {view === 'grid' ? (
+              {view === "grid" ? (
                 <>
                   <Table className="h-5 w-5 text-blue-600" />
                   <span>Switch to Table</span>
@@ -155,10 +165,26 @@ export const Dashboard = () => {
             />
           </div>
         </div>
-
-        {view === 'grid' ? (
+        {isLoadingClients ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Spinner
+              variant="wave"
+              label="Loading clients, please wait..."
+              classNames={{ label: "text-foreground mt-4 text-sm" }}
+            />
+          </div>
+        ) : view === "grid" ? (
           <ClientGridView
-            clients={filteredClients}
+            clients={paginatedClients}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            totalItems={filteredClients.length}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
             onEdit={openEditModal}
             onDelete={openDeleteModal}
           />
